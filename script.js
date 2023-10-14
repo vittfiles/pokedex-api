@@ -15,10 +15,18 @@ const getAll = async (url) =>{
         console.log(json);
         const pokemons = json.results;
 
+        let fetchImg = pokemons.map(pokemon => fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`));
+        let resImg = await Promise.all(fetchImg);
+
         for(let i = 0; i< pokemons.length; i++){
             let poke = pokemons[i];
             $template.querySelector("h2").innerHTML = poke.name;
-            try{
+
+            let jsonPoke = await resImg[i].json();
+            if(!resImg[i].ok) throw resImg[i];
+
+            $template.querySelector("img").setAttribute("src",`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${jsonPoke.id}.png`);
+            /* try{
                 let respuesta = await fetch("https://pokeapi.co/api/v2/pokemon/" + poke.name);
                 let jsonPoke = await respuesta.json();
 
@@ -28,7 +36,7 @@ const getAll = async (url) =>{
 
             }catch(err){
                 console.log(err);
-            }
+            } */
             $card = $template.cloneNode(true);
             $fragment.appendChild($card);
         }
